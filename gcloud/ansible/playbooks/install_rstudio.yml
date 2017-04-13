@@ -1,0 +1,51 @@
+- hosts: "{{ var_host | default('dev')}}"
+  become: true
+  become_user: root
+
+  vars: 
+    rstudio_url: https://download2.rstudio.org/rstudio-server-rhel-1.0.136-x86_64.rpm
+    user_pass: $1$rs$XAwdqaPdnFdmifL8CILRO/
+    webport: 80
+
+  tasks:
+  - name: "Add user rstudent" 
+    user: name=rstudent comment="R Student" uid=1001 password={{ user_pass }}
+    become: true
+    become_user: root
+
+  - name: "Install epel"
+    yum: name=epel-release state=present 
+    become: true
+    become_user: root
+
+  - name: "Install R"
+    yum: name=R state=present
+    become: true
+    become_user: root
+
+  - name: "Install dependencies"
+    yum: name={{item}} state=installed
+    with_items:
+       - R-Rcpp
+       - openssl
+       - openssl-devel
+       - git
+       - libcurl-devel
+       - libxml2-devel
+
+  - name: "Install RStudio"
+    yum: name={{ rstudio_url }} state=present
+    become: true
+    become_user: root
+
+  - name: "Set default port"
+    lineinfile:
+      dest: /etc/rstudio/rserver.conf
+      state: present
+      line: "www-port={{ webport }}"
+
+  - name: "Start Rstudio"
+    command: /usr/sbin/rstudio-server start
+    become: true
+    become_user: root
+
