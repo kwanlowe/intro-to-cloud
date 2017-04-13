@@ -27,6 +27,7 @@
     yum: name={{item}} state=installed
     with_items:
        - R-Rcpp
+       - R-Rcpp-devel
        - openssl
        - openssl-devel
        - git
