@@ -1,8 +1,10 @@
 - hosts: "{{ var_host | default('dev')}}"
   become: yes
   become_user: root
+
   vars:
     swapfile: /var/cache/swap01.swap
+    swapsize: 1536
 
   tasks:
   - stat: path={{ swapfile }}
@@ -15,7 +17,7 @@
       executable: /bin/bash
 
   - name: Create swapfile
-    command: dd if=/dev/zero of={{ swapfile }} count=1536 bs=1MiB
+    command: "dd if=/dev/zero of={{ swapfile }} count={{ swapsize }} bs=1MiB"
     when: swap_exists.stat.exists == False
 
   - name: Format {{ swapfile }} as swap
