@@ -1,0 +1,35 @@
+- hosts: "{{ var_host | default('dev')}}"
+  become: yes
+  become_user: root
+
+  vars:
+    swapfile: /var/cache/swap01.swap
+    swapsize: 1536
+
+  tasks:
+  - stat: path={{ swapfile }}
+    register: swap_exists
+
+  - shell: "swap=$(swapon -s|grep -c {{ swapfile }}); echo $swap"
+    register: swap_mounted
+    ignore_errors: yes
+    args:
+      executable: /bin/bash
+
+  - name: Create swapfile
+    command: "dd if=/dev/zero of={{ swapfile }} count={{ swapsize }} bs=1MiB"
+    when: swap_exists.stat.exists == False
+
+  - name: Format {{ swapfile }} as swap
+    command: mkswap {{ swapfile }}
+    when: 
+      - swap_mounted.stdout == "0"
+
+  - name: Set permissions on {{ swapfile }}
+    file: path={{ swapfile }} owner=root group=root mode=0600
+
+  - command: swapon {{ swapfile }}
+    when: swap_mounted.stdout == "0"
+
+  - mount: name=none src={{ swapfile }} fstype=swap opts=sw passno=0 dump=0 state=present
+
