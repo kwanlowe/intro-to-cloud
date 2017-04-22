@@ -1,0 +1,20 @@
+Cloud Config Examples
+  http://cloudinit.readthedocs.io/en/latest/topics/examples.html#
+
+AWS Data
+AMI ID are specific to each zone. Easiest way to find them:
+
+aws ec2 describe-images --owners "309956199498" \
+    --filters "Name=hypervisor,Values=xen" \
+              "Name=architecture,Values=x86_64" \
+              "Name=root-device-type,Values=ebs"
+
+
+
+Troubleshooting
+
+Grab cloud-init script from instance:
+ curl -L http://169.254.169.254/latest/user-data/ | base64 --decode 
+
+Grab console
+ aws ec2 get-console-output --instanceid- <instance id>

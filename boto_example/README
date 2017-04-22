@@ -1,0 +1,23 @@
+(c) 2017 by Kwan Lowe
+Licensed under GPL 3.0 or later.
+
+== Installation ==
+
+=== System Setup ===
+
+* /RECOMMENDED/ Create a Python virtual environment in your development system
+
+  sudo yum install python-virtualenv git
+  mkdir -p venv/aws
+  virtualenv venv/aws
+  source venv/aws/bin/activate
+
+* /REQUIRED/  Install the necessary libraries:
+
+  pip install boto3 awscli pprint optparse ConfigParser
+
+* Setup your AWS keys for each environment
+
+  aws configure
+
+

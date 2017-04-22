@@ -1,0 +1,27 @@
+#cloud-config
+hostname: <<hostname>>
+fqdn: <<hostname>>
+repo_update: true
+repo_upgrade: all
+preserve_hostname: true
+package_upgrade: true
+
+users:
+  - default
+  - name: kwan
+    gecos: Kwan Lowe
+    groups: wheel
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys:
+      - ssh-rsa AAAAB3ThisisnotarealkeyThisisnotarealkeyfCFhsuhGYJskcbN123NOpRFsuehGThisIsNotARealKeymThisisnotarealkeyThisisnotarealkeyThisisnotarealkeyThisisnotarealkeyThisisnotarealkeyThisisnotarealkeyThisisnotarealkeyThisisnotarealkeyThisisnotarealkeyThisisnotarealkeyThisisnotarealkeyThisisnotarealkeyThisisnotarealkeyThisisnotarealkeyThisisnotarealkeyThisisnotarealkeDDFFLLEEXXxVQ== kwan@vm-helios-001.digitalhermit.com
+
+
+runcmd:
+  - [ hostnamectl, set-hostname, <<vmHostname>> ]
+
+power_state:
+ delay: "+30"
+ mode: reboot
+ message: Cloud-Init completed. Rebooting.
+ timeout: 30
+ condition: True
