@@ -1,0 +1,41 @@
+- name: Compute Engine Instance 
+  hosts: localhost
+  vars:
+    service_account_email: "<replace_with_your_service_email>"
+    credentials_file: "<replace_with_path_to_credentials.json>"
+    project_id: "<replace with project ID>"
+  tasks:
+    - name: Create multiple instances
+      gce:
+        instance_names: flux1,flux2
+        zone: us-east1-b
+        machine_type: f1-micro
+        image: centos-7
+        state: present
+        service_account_email: "{{ service_account_email }}"
+        credentials_file: "{{ credentials_file }}"
+        project_id: "{{ project_id }}"
+        metadata : '{ "startup-script" : "yum -y update" }'
+      register: gce
+
+    - name: Save host data
+      add_host:
+        hostname: "{{ item.public_ip }}"
+        groupname: gce_instances_ips
+      with_items: "{{ gce.instance_data }}"
+
+    - name: Wait for SSH for instances
+      wait_for:
+        delay: 1
+        host: "{{ item.public_ip }}"
+        port: 22
+        state: started
+        timeout: 30
+      with_items: "{{ gce.instance_data }}"
+
+- name: Configure hosts
+  hosts: gce_instances_ips
+  become: true
+  roles:
+    - baseline
+
